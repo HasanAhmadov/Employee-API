@@ -34,8 +34,10 @@ namespace MicroServices.BusinessLayer.Services
             entity.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
 
             var role = employeeDataAccess.GetRoleById(dto.RoleId);
+            var bossId = employeeDataAccess.GetBossIdById(dto.BossId);
             entity.EmployeeRoleId = dto.RoleId;
             entity.EmployeeRole = role;
+            entity.BossId = bossId;
 
             return employeeDataAccess.Add(entity);
         }
@@ -46,7 +48,9 @@ namespace MicroServices.BusinessLayer.Services
 
             updatedEntity.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
 
-            return employeeDataAccess.Update(id, updatedEntity);
+            var response = employeeDataAccess.Update(id, updatedEntity);
+
+            return response;
         }
 
         public bool Delete(Guid id)

@@ -35,7 +35,10 @@ namespace MicroServices.DataAccessLayer.Services
 
         public Employee? Update(Guid id, Employee employee)
         {
-            var existingEmployee = dbContext.Employees.Find(id);
+            var existingEmployee = dbContext.Employees
+                .Include(e => e.EmployeeRole)
+                .FirstOrDefault(e => e.Id == id);
+
             if (existingEmployee == null) return null;
 
             existingEmployee.Name = employee.Name;
@@ -43,12 +46,15 @@ namespace MicroServices.DataAccessLayer.Services
             existingEmployee.Phone = employee.Phone;
             existingEmployee.Salary = employee.Salary;
             existingEmployee.EmployeeRoleId = employee.EmployeeRoleId;
+            existingEmployee.BossId = employee.BossId;
 
             existingEmployee.PasswordHash = employee.PasswordHash;
 
             dbContext.SaveChanges();
 
-            return existingEmployee;
+            var updatedEmployee = GetById(id);
+
+            return updatedEmployee;
         }
 
         public bool Delete(Guid id)
@@ -64,5 +70,22 @@ namespace MicroServices.DataAccessLayer.Services
         {
             return dbContext.Roles.Find(id);
         }
+
+        public Guid GetBossIdById(Guid id)
+        {
+            var employee = dbContext.Employees.Find(id);
+            if (employee == null)
+            {
+                throw new Exception("Employee not found.");
+            }
+
+            if (employee.Id == null || employee.Id == Guid.Empty)
+            {
+                throw new Exception("Boss ID not assigned for this employee.");
+            }
+
+            return employee.Id;
+        }
+
     }
 }

@@ -11,5 +11,6 @@ namespace MicroServices.BusinessLayer.DTOs
         public decimal Salary { get; set; }
         public required string Password { get; set; }
         public required int RoleId { get; set; }
+        public required Guid BossId { get; set; }
     }
 }

@@ -10,5 +10,6 @@ namespace MicroServices.DataAccessLayer.Interfaces
         Employee? Update(Guid id, Employee employee);
         bool Delete(Guid id);
         Role GetRoleById(int id);
+        Guid GetBossIdById(Guid id);
     }
 }

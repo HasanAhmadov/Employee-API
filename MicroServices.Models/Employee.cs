@@ -13,5 +13,6 @@ namespace MicroServices.Models
         public required string PasswordHash { get; set; }
         public int EmployeeRoleId { get; set; }
         public required Role EmployeeRole { get; set; }
+        public required Guid BossId { get; set; }
     }
 }

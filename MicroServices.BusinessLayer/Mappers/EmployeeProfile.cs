@@ -9,7 +9,8 @@ namespace MicroServices.BusinessLayer.Mappers
         public EmployeeProfile() {
             CreateMap<Employee, EmployeeDTO>();
             CreateMap<EmployeeDTO, Employee>()
-            .ForMember(dest => dest.PasswordHash, opt => opt.Ignore());
+            .ForMember(dest => dest.PasswordHash, opt => opt.Ignore())
+            .ForMember(dest => dest.EmployeeRoleId, opt => opt.MapFrom(map => map.RoleId));
         }
     }
 }
