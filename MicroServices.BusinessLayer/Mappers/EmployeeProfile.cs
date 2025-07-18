@@ -1,0 +1,15 @@
+﻿using AutoMapper;
+using MicroServices.BusinessLayer.DTOs;
+using MicroServices.Models;
+
+namespace MicroServices.BusinessLayer.Mappers
+{
+    public class EmployeeProfile : Profile
+    {
+        public EmployeeProfile() {
+            CreateMap<Employee, EmployeeDTO>();
+            CreateMap<EmployeeDTO, Employee>()
+            .ForMember(dest => dest.PasswordHash, opt => opt.Ignore());
+        }
+    }
+}
