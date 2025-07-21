@@ -12,5 +12,6 @@ namespace MicroServices.BusinessLayer.DTOs
         public required string Password { get; set; }
         public required int RoleId { get; set; }
         public required Guid BossId { get; set; }
+        public required int ShiftId { get; set; }
     }
 }

@@ -14,5 +14,7 @@ namespace MicroServices.Models
         public int EmployeeRoleId { get; set; }
         public required Role EmployeeRole { get; set; }
         public required Guid BossId { get; set; }
+        public int EmployeeShiftId { get; set; }
+        public required Shift EmployeeShift { get; set; }
     }
 }

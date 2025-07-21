@@ -35,9 +35,13 @@ namespace MicroServices.BusinessLayer.Services
 
             var role = employeeDataAccess.GetRoleById(dto.RoleId);
             var bossId = employeeDataAccess.GetBossIdById(dto.BossId);
+            var shift = employeeDataAccess.GetShiftById(dto.ShiftId);
+
             entity.EmployeeRoleId = dto.RoleId;
             entity.EmployeeRole = role;
             entity.BossId = bossId;
+            entity.EmployeeShiftId = dto.ShiftId;
+            entity.EmployeeShift = shift;
 
             return employeeDataAccess.Add(entity);
         }

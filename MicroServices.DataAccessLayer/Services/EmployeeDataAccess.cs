@@ -13,6 +13,7 @@ namespace MicroServices.DataAccessLayer.Services
         {
             var employees = dbContext.Employees
             .Include(e => e.EmployeeRole)
+            .Include(e => e.EmployeeShift)
             .ToList();
             return [.. employees];
         }
@@ -21,6 +22,7 @@ namespace MicroServices.DataAccessLayer.Services
         {
             return dbContext.Employees
                 .Include(e => e.EmployeeRole)
+                .Include(e => e.EmployeeShift)
                 .FirstOrDefault(e => e.Id == id);
         }
 
@@ -37,6 +39,7 @@ namespace MicroServices.DataAccessLayer.Services
         {
             var existingEmployee = dbContext.Employees
                 .Include(e => e.EmployeeRole)
+                .Include (e => e.EmployeeShift)
                 .FirstOrDefault(e => e.Id == id);
 
             if (existingEmployee == null) return null;
@@ -71,6 +74,11 @@ namespace MicroServices.DataAccessLayer.Services
             return dbContext.Roles.Find(id);
         }
 
+        public Shift GetShiftById(int id)
+        {
+            return dbContext.Shifts.Find(id);
+        }
+
         public Guid GetBossIdById(Guid id)
         {
             var employee = dbContext.Employees.Find(id);
@@ -86,6 +94,5 @@ namespace MicroServices.DataAccessLayer.Services
 
             return employee.Id;
         }
-
     }
 }

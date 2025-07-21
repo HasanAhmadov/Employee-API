@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MicroServices.DataAccessLayer.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250717170729_AddRoleTable3")]
-    partial class AddRoleTable3
+    [Migration("20250721073159_AddShiftsFixed")]
+    partial class AddShiftsFixed
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -31,11 +31,17 @@ namespace MicroServices.DataAccessLayer.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("BossId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("EmployeeRoleId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("EmployeeShiftId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
@@ -49,16 +55,14 @@ namespace MicroServices.DataAccessLayer.Migrations
                     b.Property<string>("Phone")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Role")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<decimal>("Salary")
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("EmployeeRoleId");
+
+                    b.HasIndex("EmployeeShiftId");
 
                     b.ToTable("Employees");
                 });
@@ -103,6 +107,27 @@ namespace MicroServices.DataAccessLayer.Migrations
                     b.ToTable("Roles");
                 });
 
+            modelBuilder.Entity("MicroServices.Models.Shift", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("WorkEnd")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("WorkStart")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Shifts");
+                });
+
             modelBuilder.Entity("MicroServices.Models.Employee", b =>
                 {
                     b.HasOne("MicroServices.Models.Role", "EmployeeRole")
@@ -111,7 +136,15 @@ namespace MicroServices.DataAccessLayer.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("MicroServices.Models.Shift", "EmployeeShift")
+                        .WithMany()
+                        .HasForeignKey("EmployeeShiftId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("EmployeeRole");
+
+                    b.Navigation("EmployeeShift");
                 });
 
             modelBuilder.Entity("MicroServices.Models.EmployeeLog", b =>

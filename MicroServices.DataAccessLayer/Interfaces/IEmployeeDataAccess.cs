@@ -11,5 +11,6 @@ namespace MicroServices.DataAccessLayer.Interfaces
         bool Delete(Guid id);
         Role GetRoleById(int id);
         Guid GetBossIdById(Guid id);
+        Shift GetShiftById(int id);
     }
 }

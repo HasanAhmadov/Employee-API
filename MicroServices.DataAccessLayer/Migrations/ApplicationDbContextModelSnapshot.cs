@@ -38,6 +38,9 @@ namespace MicroServices.DataAccessLayer.Migrations
                     b.Property<int>("EmployeeRoleId")
                         .HasColumnType("int");
 
+                    b.Property<int>("EmployeeShiftId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -55,6 +58,8 @@ namespace MicroServices.DataAccessLayer.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("EmployeeRoleId");
+
+                    b.HasIndex("EmployeeShiftId");
 
                     b.ToTable("Employees");
                 });
@@ -99,6 +104,27 @@ namespace MicroServices.DataAccessLayer.Migrations
                     b.ToTable("Roles");
                 });
 
+            modelBuilder.Entity("MicroServices.Models.Shift", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("WorkEnd")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("WorkStart")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Shifts");
+                });
+
             modelBuilder.Entity("MicroServices.Models.Employee", b =>
                 {
                     b.HasOne("MicroServices.Models.Role", "EmployeeRole")
@@ -107,7 +133,15 @@ namespace MicroServices.DataAccessLayer.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("MicroServices.Models.Shift", "EmployeeShift")
+                        .WithMany()
+                        .HasForeignKey("EmployeeShiftId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("EmployeeRole");
+
+                    b.Navigation("EmployeeShift");
                 });
 
             modelBuilder.Entity("MicroServices.Models.EmployeeLog", b =>
