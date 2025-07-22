@@ -7,5 +7,6 @@ namespace MicroServices.DataAccessLayer.Interfaces
         Task<bool> LogEmployeeActionAsync(Guid employeeId, string action);
         Task<IEnumerable<EmployeeLog>> GetAllLogsAsync();
         Task<IEnumerable<EmployeeLog>> GetLogsByEmployeeIdAsync(Guid employeeId);
-    }
+        Task<IEnumerable<Shift>> GetShiftByEmployeeIdAsync(int id);
+     }
 }

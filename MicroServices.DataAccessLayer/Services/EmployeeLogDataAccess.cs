@@ -22,7 +22,7 @@ namespace MicroServices.DataAccessLayer.Services
                 Id = Guid.NewGuid(),
                 EmployeeId = employeeId,
                 Action = action,
-                Timestamp = DateTime.UtcNow
+                Timestamp = DateTime.UtcNow.AddHours(4)
             });
 
             await _context.SaveChangesAsync();
@@ -43,5 +43,10 @@ namespace MicroServices.DataAccessLayer.Services
                 .OrderByDescending(l => l.Timestamp)
                 .ToListAsync();
         }
+
+        public async Task<IEnumerable<Shift>> GetShiftByEmployeeIdAsync(int id)
+            => await _context.Shifts
+                .Where(a => a.Id == id)
+                .ToListAsync();
     }
 }

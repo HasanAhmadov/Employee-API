@@ -1,4 +1,5 @@
-﻿using MicroServices.BusinessLayer.DTOs;
+﻿using AutoMapper;
+using MicroServices.BusinessLayer.DTOs;
 using MicroServices.BusinessLayer.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,12 +14,14 @@ namespace APIPractice.Controllers
     {
         private readonly IEmployeeLogService _employeeLogService;
         private readonly IEmployeeService _employeeService;
+        private readonly IMapper _mapper;
 
         private readonly IDbConnection db;
-        public EmployeeLogController(IEmployeeLogService employeeLogService, IEmployeeService employeeService)
+        public EmployeeLogController(IMapper mapper,IEmployeeLogService employeeLogService, IEmployeeService employeeService)
         {
             _employeeLogService = employeeLogService;
             _employeeService = employeeService;
+            _mapper = mapper;
         }
 
         [Authorize]
@@ -82,6 +85,47 @@ namespace APIPractice.Controllers
             {
                 var logs = await _employeeLogService.GetLogsByEmployeeIdAsync(employeeId);
                 return Ok(logs);
+            }
+
+            return Forbid();
+        }
+
+        [Authorize]
+        [HttpGet("GetAttendanceByEmployeeId/{employeeId}")]
+        public async Task<IActionResult> GetAttendanceByEmployeeId(Guid employeeId)
+        {
+            var currentEmployeeId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var currentUserRole = User.FindFirstValue(ClaimTypes.Role);
+
+            var targetEmployee = _employeeService.GetById(employeeId);
+            if (targetEmployee == null)
+                return NotFound("Employee not found");
+
+            var employeeDto = _mapper.Map<EmployeeDTO>(targetEmployee);
+
+            if (!Guid.TryParse(currentEmployeeId, out var guidCurrentEmployeeId))
+                return Forbid();
+
+            if (currentUserRole == "1")
+            {
+                var attendance = await _employeeLogService.GetAttendanceByEmployeeIdAsync(employeeId, employeeDto);
+                return Ok(attendance);
+            }
+
+            if (guidCurrentEmployeeId == employeeId)
+            {
+                var attendance = await _employeeLogService.GetAttendanceByEmployeeIdAsync(employeeId, employeeDto);
+                return Ok(attendance);
+            }
+
+            var targetRole = targetEmployee.EmployeeRoleId.ToString();
+
+            if ((currentUserRole == "2" && targetRole == "5") ||
+                (currentUserRole == "4" && targetRole == "7") ||
+                (currentUserRole == "3" && targetRole == "6"))
+            {
+                var attendance = await _employeeLogService.GetAttendanceByEmployeeIdAsync(employeeId, employeeDto);
+                return Ok(attendance);
             }
 
             return Forbid();
