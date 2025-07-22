@@ -1,4 +1,5 @@
-﻿using MicroServices.BusinessLayer.DTOs;
+﻿using AutoMapper;
+using MicroServices.BusinessLayer.DTOs;
 using MicroServices.BusinessLayer.Interfaces;
 using MicroServices.DataAccessLayer.Interfaces;
 
@@ -7,10 +8,14 @@ namespace MicroServices.BusinessLayer.Services
     public class EmployeeLogService : IEmployeeLogService
     {
         private readonly IEmployeeLogDataAccess _dataAccess;
+        private readonly IEmployeeService _employeeService;
+        private readonly IMapper _mapper;
 
-        public EmployeeLogService(IEmployeeLogDataAccess dataAccess)
+        public EmployeeLogService(IEmployeeLogDataAccess dataAccess, IEmployeeService employeeService, IMapper mapper)
         {
             _dataAccess = dataAccess ?? throw new ArgumentNullException(nameof(dataAccess));
+            _employeeService = employeeService;
+            _mapper = mapper;
         }
 
         public async Task<string> LogEntryAsync(Guid employeeId, EmployeeLogRequestDTO request)
@@ -127,6 +132,24 @@ namespace MicroServices.BusinessLayer.Services
             }
 
             return result;
+        }
+
+        public async Task<List<List<AttendanceDTO>>> GetAttendancesByRolesAsync(List<int> roleIds)
+        {
+            var employees = _employeeService.GetAll();
+            var filteredEmployees = employees.Where(e => roleIds.Contains(e.EmployeeRoleId)).ToList();
+
+            var results = new List<List<AttendanceDTO>>();
+
+            foreach (var emp in filteredEmployees)
+            {
+                var empDto = _mapper.Map<EmployeeDTO>(emp);
+                var attendance = await GetAttendanceByEmployeeIdAsync(emp.Id, empDto);
+                if (attendance != null && attendance.Any())
+                    results.Add(attendance);
+            }
+
+            return results;
         }
     }
 }

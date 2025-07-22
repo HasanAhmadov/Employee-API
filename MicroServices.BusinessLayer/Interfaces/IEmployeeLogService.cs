@@ -8,5 +8,6 @@ namespace MicroServices.BusinessLayer.Interfaces
         Task<IEnumerable<object>> GetAllLogsAsync();
         Task<IEnumerable<object>> GetLogsByEmployeeIdAsync(Guid employeeId);
         Task<List<AttendanceDTO>> GetAttendanceByEmployeeIdAsync(Guid employeeId, EmployeeDTO employee);
+        Task<List<List<AttendanceDTO>>> GetAttendancesByRolesAsync(List<int> roleIds);
     }
 }

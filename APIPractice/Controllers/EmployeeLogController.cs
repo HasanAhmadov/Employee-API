@@ -25,7 +25,7 @@ namespace APIPractice.Controllers
         }
 
         [Authorize]
-        [HttpPost("Log")]
+        [HttpPost("LogEntry")]
         public async Task<IActionResult> LogEntry([FromBody] EmployeeLogRequestDTO request)
         {
             
@@ -44,7 +44,7 @@ namespace APIPractice.Controllers
         }
 
         [Authorize(Roles = "1")]
-        [HttpGet("GetAll")]
+        [HttpGet("GetAllLogs")]
         public async Task<IActionResult> GetAllLogs()
         {
             var logs = await _employeeLogService.GetAllLogsAsync();
@@ -129,6 +129,43 @@ namespace APIPractice.Controllers
             }
 
             return Forbid();
+        }
+
+        [Authorize]
+        [HttpGet("GetAllEmployeesAttendances")]
+        public async Task<IActionResult> GetAllEmployeesAttendances()
+        {
+            var currentEmployeeId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var currentUserRole = User.FindFirstValue(ClaimTypes.Role);
+
+            if (!Guid.TryParse(currentEmployeeId, out var guidCurrentEmployeeId))
+                return Forbid();
+
+            List<int> targetRoles = new();
+            
+            if (currentUserRole == "1")
+                targetRoles.AddRange(new[] { 2, 3, 4 });
+            else if (currentUserRole == "2")
+                targetRoles.Add(5);
+            else if (currentUserRole == "3")
+                targetRoles.Add(6);
+            else if (currentUserRole == "4")
+                targetRoles.Add(7);
+            else if (currentUserRole is not ("5" or "6" or "7"))
+                return Forbid();
+
+            if (targetRoles.Count == 0)
+            {
+                var employee = _employeeService.GetById(guidCurrentEmployeeId);
+                if (employee == null) return NotFound();
+
+                var dto = _mapper.Map<EmployeeDTO>(employee);
+                var attendance = await _employeeLogService.GetAttendanceByEmployeeIdAsync(guidCurrentEmployeeId, dto);
+                return Ok(attendance);
+            }
+
+            var result = await _employeeLogService.GetAttendancesByRolesAsync(targetRoles);
+            return Ok(result);
         }
     }
 }
