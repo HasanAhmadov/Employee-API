@@ -92,6 +92,17 @@ namespace APIPractice.Controllers
             if (permission == null)
                 return NotFound("Permission not found.");
 
+            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!Guid.TryParse(userIdStr, out Guid approverId))
+                return Forbid();
+
+            if (permission.RequesterId == approverId)
+                return BadRequest("You cannot approve or reject your own request.");
+
+            var requester = _employeeService.GetById(permission.RequesterId);
+            if (requester == null || requester.BossId != approverId)
+                return Forbid("You are not authorized to approve or reject this request.");
+
             if (!Enum.TryParse<PermissionStatus>(status, true, out var parsedStatus) ||
                 !Enum.IsDefined(typeof(PermissionStatus), parsedStatus) ||
                 parsedStatus == PermissionStatus.Pending)

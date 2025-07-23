@@ -1,9 +1,6 @@
-﻿using MicroServices.BusinessLayer.DTOs;
-using MicroServices.BusinessLayer.Interfaces;
-using MicroServices.DataAccessLayer.Data;
+﻿using MicroServices.BusinessLayer.Interfaces;
 using MicroServices.DataAccessLayer.Interfaces;
 using MicroServices.Models;
-using MicroServices.Models.Enums;
 
 namespace MicroServices.BusinessLayer.Services
 {
