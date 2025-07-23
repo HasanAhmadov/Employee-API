@@ -10,5 +10,6 @@ namespace MicroServices.BusinessLayer.Interfaces
         Employee Add(EmployeeDTO dto);
         Employee? Update(Guid id, EmployeeDTO dto);
         bool Delete(Guid id);
+        Guid GetBossOfEmployeeAsync(Guid employeeId);
     }
 }

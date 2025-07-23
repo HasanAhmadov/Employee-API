@@ -11,5 +11,6 @@ namespace MicroServices.DataAccessLayer.Data
         public DbSet<EmployeeLog> EmployeeLogs { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<Shift> Shifts { get; set; }
+        public DbSet<Permission> Permissions { get; set; }
     }
 }

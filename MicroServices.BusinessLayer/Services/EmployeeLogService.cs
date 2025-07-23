@@ -75,9 +75,9 @@ namespace MicroServices.BusinessLayer.Services
             DateTime startOfMonth = new DateTime(today.Year, today.Month, 1);
 
             var groupedByDay = logs
-                .Where(l => l.Timestamp.Date >= startOfMonth && l.Timestamp.Date <= today)
-                .GroupBy(l => l.Timestamp.Date)
-                .OrderBy(g => g.Key);
+            .Where(l => l.Timestamp.Date >= startOfMonth && l.Timestamp.Date <= today)
+            .GroupBy(l => l.Timestamp.Date)
+            .OrderByDescending(g => g.Key);
 
             var result = new List<AttendanceDTO>();
 

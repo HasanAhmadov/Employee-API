@@ -61,5 +61,15 @@ namespace MicroServices.BusinessLayer.Services
         {
             return employeeDataAccess.Delete(id);
         }
+
+        public Guid GetBossOfEmployeeAsync(Guid employeeId)
+        {
+            var employee = employeeDataAccess.GetById(employeeId);
+            if (employee == null)
+                throw new Exception("There's no such that employee!");
+
+            return employee.BossId;
+        }
+
     }
 }

@@ -51,6 +51,8 @@ builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<IEmployeeDataAccess, EmployeeDataAccess>();
 builder.Services.AddScoped<IEmployeeLogService, EmployeeLogService>();
 builder.Services.AddScoped<IEmployeeLogDataAccess, EmployeeLogDataAccess>();
+builder.Services.AddScoped<IPermissionService, PermissionService>();
+builder.Services.AddScoped<IPermissionDataAccess, PermissionDataAccess>();
 
 builder.Services.AddAutoMapper(typeof(EmployeeProfile));
 
