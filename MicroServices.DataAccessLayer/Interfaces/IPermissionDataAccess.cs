@@ -13,6 +13,5 @@ namespace MicroServices.DataAccessLayer.Interfaces
         Task<List<Permission>> GetByRequesterIdAsync(Guid requesterId);
         Task<List<Permission>> GetByTargetEmployeeIdAsync(Guid targetEmployeeId);
         Task<List<Permission>> GetAllRelatedToEmployeeAsync(Guid employeeId);
-
     }
 }

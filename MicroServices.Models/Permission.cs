@@ -1,5 +1,4 @@
-﻿
-using MicroServices.Models.Enums;
+﻿using MicroServices.Models.Enums;
 
 namespace MicroServices.Models
 {

@@ -52,7 +52,7 @@ namespace APIPractice.Controllers
         }
 
         [Authorize]
-        [HttpGet("GetByEmployeeId/{employeeId}")]
+        [HttpGet("GetLogsByEmployeeId/{employeeId}")]
         public async Task<IActionResult> GetLogsByEmployeeId(Guid employeeId)
         {
             var currentEmployeeId = User.FindFirstValue(ClaimTypes.NameIdentifier);

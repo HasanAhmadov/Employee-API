@@ -2,6 +2,7 @@
 using MicroServices.BusinessLayer.DTOs;
 using MicroServices.BusinessLayer.Interfaces;
 using MicroServices.DataAccessLayer.Interfaces;
+using MicroServices.Models.Enums;
 
 namespace MicroServices.BusinessLayer.Services
 {
@@ -9,12 +10,14 @@ namespace MicroServices.BusinessLayer.Services
     {
         private readonly IEmployeeLogDataAccess _dataAccess;
         private readonly IEmployeeService _employeeService;
+        private readonly IPermissionService _permissionService;
         private readonly IMapper _mapper;
 
-        public EmployeeLogService(IEmployeeLogDataAccess dataAccess, IEmployeeService employeeService, IMapper mapper)
+        public EmployeeLogService(IEmployeeLogDataAccess dataAccess, IEmployeeService employeeService, IPermissionService permissionService, IMapper mapper)
         {
             _dataAccess = dataAccess ?? throw new ArgumentNullException(nameof(dataAccess));
             _employeeService = employeeService;
+            _permissionService = permissionService;
             _mapper = mapper;
         }
 
@@ -57,12 +60,25 @@ namespace MicroServices.BusinessLayer.Services
         }
 
         /// <summary>
-        /// 
+        /// Butun temalar burdadi
         /// </summary>
         public async Task<List<AttendanceDTO>> GetAttendanceByEmployeeIdAsync(Guid employeeId, EmployeeDTO employee)
         {
             var logs = await _dataAccess.GetLogsByEmployeeIdAsync(employeeId);
             var shiftList = await _dataAccess.GetShiftByEmployeeIdAsync(employee.ShiftId);
+            var permissions = await _permissionService.GetAllRelatedToEmployeeAsync(employeeId);
+
+            var dateRanges = new List<(DateTime Begin, DateTime End)>();
+
+            foreach (var permission in permissions)
+            {
+                if (permission.Status == PermissionStatus.Approved &&
+                    (employeeId == permission.RequesterId || permission.TargetEmployeeId == employee.BossId))
+                {
+                    dateRanges.Add((permission.BeginDate, permission.EndDate));
+                }
+            }
+
             var shift = shiftList.FirstOrDefault();
 
             if (shift == null)
@@ -78,9 +94,9 @@ namespace MicroServices.BusinessLayer.Services
             DateTime startOfMonth = new DateTime(today.Year, today.Month, 1);
 
             var groupedByDay = logs
-            .Where(l => l.Timestamp.Date >= startOfMonth && l.Timestamp.Date <= today)
-            .GroupBy(l => l.Timestamp.Date)
-            .OrderByDescending(g => g.Key);
+                .Where(l => l.Timestamp.Date >= startOfMonth && l.Timestamp.Date <= today)
+                .GroupBy(l => l.Timestamp.Date)
+                .OrderByDescending(g => g.Key);
 
             var result = new List<AttendanceDTO>();
 
@@ -104,25 +120,29 @@ namespace MicroServices.BusinessLayer.Services
                 if (enterLog == null || exitLog == null)
                     continue;
 
-                int minutesLeftEarly = 0;
                 DateTime expectedStart = date + shiftStart;
                 DateTime expectedEnd = date + shiftEnd;
 
-                DateTime realStart = enterLog.Timestamp < expectedStart ? expectedStart : enterLog.Timestamp;
-                DateTime realEnd = exitLog.Timestamp;
+                bool isExcusedByPermission = dateRanges.Any(range =>
+                    range.Begin <= expectedEnd && range.End >= expectedStart);
 
-                if (exitLog.Timestamp <= expectedStart || enterLog.Timestamp >= expectedEnd)
+                int minutesLateBeforeEnter = 0;
+                int minutesLeftEarlyAfterExit = 0;
+
+                if (!isExcusedByPermission)
                 {
-                    minutesLeftEarly = (int)(expectedEnd - expectedStart).TotalMinutes;
-                }
-                else
-                {
-                    DateTime actualExit = exitLog.Timestamp;
-                    if (actualExit < expectedEnd)
+                    if (enterLog.Timestamp > expectedStart)
                     {
-                        minutesLeftEarly = (int)(expectedEnd - actualExit).TotalMinutes;
+                        minutesLateBeforeEnter = (int)(enterLog.Timestamp - expectedStart).TotalMinutes;
+                    }
+
+                    if (exitLog.Timestamp < expectedEnd)
+                    {
+                        minutesLeftEarlyAfterExit = (int)(expectedEnd - exitLog.Timestamp).TotalMinutes;
                     }
                 }
+
+                int totalMinutesLate = minutesLateBeforeEnter + minutesLeftEarlyAfterExit;
 
                 result.Add(new AttendanceDTO
                 {
@@ -130,7 +150,7 @@ namespace MicroServices.BusinessLayer.Services
                     EmployeeShift = shift,
                     EarliestEnterTime = enterLog.Timestamp,
                     LatestExitTime = exitLog.Timestamp,
-                    MinutesLate = minutesLeftEarly
+                    MinutesLate = totalMinutesLate
                 });
             }
 
