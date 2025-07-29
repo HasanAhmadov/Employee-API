@@ -32,27 +32,25 @@ namespace APIPractice.Controllers
         }
 
         [HttpPost("AddEmployee")]
-        public IActionResult AddEmployee(EmployeeDTO employeeDTO)
+        public IActionResult AddEmployee([FromBody] EmployeeDTO employeeDTO)
         {
             var employeeEntity = employeeService.Add(employeeDTO);
             return Ok(employeeEntity);
         }
 
         [HttpPut("UpdateEmployee/{id}")]
-        public IActionResult UpdateEmployee(Guid id, EmployeeDTO employeeDTO)
+        public IActionResult UpdateEmployee([FromRoute] Guid id, [FromBody] EmployeeDTO employeeDTO)
         {
             var employee = employeeService.Update(id, employeeDTO);
             if (employee == null) return NotFound();
             return Ok(employee);
         }
 
-        [HttpDelete("DeleteEmployee")]
-        public IActionResult DeleteEmployee(Guid id) {
-
-            var employee = employeeService.Delete(id);   
-
+        [HttpDelete("DeleteEmployee/{id}")]
+        public IActionResult DeleteEmployee(Guid id)
+        {
+            var employee = employeeService.Delete(id);
             return Ok(employee);
-        
         }
     }
 }
