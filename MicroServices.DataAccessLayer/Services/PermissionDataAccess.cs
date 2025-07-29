@@ -61,6 +61,5 @@ namespace MicroServices.DataAccessLayer.Services
                 .Where(p => p.RequesterId == employeeId || p.TargetEmployeeId == employeeId)
                 .ToListAsync();
         }
-
     }
 }

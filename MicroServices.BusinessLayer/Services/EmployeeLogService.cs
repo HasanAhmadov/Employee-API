@@ -59,9 +59,6 @@ namespace MicroServices.BusinessLayer.Services
             });
         }
 
-        /// <summary>
-        /// Butun temalar burdadi
-        /// </summary>
         public async Task<List<AttendanceDTO>> GetAttendanceByEmployeeIdAsync(Guid employeeId, EmployeeDTO employee)
         {
             var logs = await _dataAccess.GetLogsByEmployeeIdAsync(employeeId);
