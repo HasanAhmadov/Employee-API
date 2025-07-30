@@ -139,7 +139,8 @@ namespace MicroServices.BusinessLayer.Services
                     }
                 }
 
-                int totalMinutesLate = minutesLateBeforeEnter + minutesLeftEarlyAfterExit;
+                int shiftDurationMinutes = (int)(expectedEnd - expectedStart).TotalMinutes;
+                int totalMinutesLate = Math.Min(minutesLateBeforeEnter + minutesLeftEarlyAfterExit, shiftDurationMinutes);
 
                 result.Add(new AttendanceDTO
                 {
