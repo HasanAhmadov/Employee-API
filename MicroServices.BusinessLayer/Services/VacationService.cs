@@ -108,5 +108,20 @@ namespace MicroServices.BusinessLayer.Services
             }
             return totalDays;
         }
+
+        public Task<List<VacationRequestDTO>> GetRequestsAsync(Guid requesterId, Guid employeeId)
+        {
+            var requests = _context.VacationRequests
+                .Where(v => v.EmployeeId == employeeId)
+                .Select(v => new VacationRequestDTO
+                {
+                    Id = v.Id,
+                    StartDate = v.StartDate,
+                    EndDate = v.EndDate,
+                    Status = v.Status,
+                })
+                .ToListAsync();
+            return requests;
+        }
     }
 }
