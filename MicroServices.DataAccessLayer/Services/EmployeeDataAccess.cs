@@ -28,7 +28,11 @@ namespace MicroServices.DataAccessLayer.Services
 
         public Employee Add(Employee employee)
         {
-            dbContext.Employees.Add(employee);
+            if (GetEmployeesByMailAsync(employee.Email))
+            {
+                throw new Exception("An employee with this email already exists.");
+            }
+            else dbContext.Employees.Add(employee);
 
             dbContext.SaveChanges();
 
@@ -94,5 +98,16 @@ namespace MicroServices.DataAccessLayer.Services
 
             return employee.Id;
         }
+
+        private bool GetEmployeesByMailAsync(string email)
+        {
+            if (dbContext.Employees
+                .Any(e => e.Email.Contains(email)))
+            {
+                return true;
+            }
+            return false;
+        }
+
     }
 }
